@@ -51,8 +51,6 @@
     // Lista de PINWHEELs permitidos
     let allowedPins = ['123456789012345', '987654321098765', '524320547839971', '364782449692871','179535553776102'];
 
-
-
     // Objeto para armazenar mensagens de usuários e última data de envio
     let userMessages = {};
     let lastMessageDate = {};
@@ -62,10 +60,7 @@
 
     function retrieveOrGeneratePin() {
       let userPin = localStorage.getItem('userPin');
-      if (!userPin) {
-        // Se o PINWHEEL não estiver armazenado, informe para o usuário clicar em Obter PINWHEEL 
-        localStorage.setItem('userPin', userPin);
-      }
+      
       document.getElementById('pinwheelPage').innerHTML = `
         <h2>Seu PINWHEEL: ${userPin}</h2>
         <p><a href="https://nubank.com.br/cobrar/tezyu/65ac71d4-2e7b-41ee-9fc0-362977b08070" target="_blank">REALIZAR PIX</a></p>
