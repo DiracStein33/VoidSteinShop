@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Acesso</title>
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pinwheelPage">
+    <button onclick="retrieveOrGeneratePin()">Obter PINWHEEL</button>
+    <p><a href="https://nubank.com.br/cobrar/tezyu/65ac71d4-2e7b-41ee-9fc0-362977b08070" target="_blank">REALIZAR PIX</a></p>
+    <p>Realize o PIX de R$20,00 e envie seu PINWHEEL e o comprovante de pagamento para o número +55 (48) 98433-0340 para ter acesso à nova página.</p>
+  </div>
+
+  <div id="unlockPage" class="hidden">
+    <h2>Seu PINWHEEL: <span id="userPin"></span></h2>
+    <h2>Links Desbloqueados</h2>
+    <ul>
+      <li><a href="https://youtube.com/@void33.?feature=shared" target="_blank">Canal</a></li>
+      <li><a href="https://steinshop.com.br/" target="_blank">Loja</a></li>
+    </ul>
+    <p>Parabéns! Você agora tem acesso à outra página.</p>
+    <button onclick="like()">Curtir <span id="likeCount">0</span></button>
+    <div id="messageSection">
+      <h2>Enviar Mensagem</h2>
+      <p>Coloque o código do seu amigo. Você só pode enviar uma mensagem por mês,e não pode colocar o próprio código.</p>
+      <textarea id="messageInput" rows="4" cols="50"></textarea>
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+    <div id="searchSection">
+      <h2>Pesquisar Usuário</h2>
+      <input type="text" id="searchInput" placeholder="Código do Usuário">
+      <button onclick="searchUser()">Pesquisar</button>
+      <div id="userMessages"></div>
+    </div>
+    <div id="searchMessagesSection">
+      <h2>Pesquisar Mensagens</h2>
+      <input type="text" id="searchMessagesInput" placeholder="Digite uma palavra-chave">
+      <button onclick="searchMessages()">Pesquisar</button>
+      <div id="foundMessages"></div>
+    </div>
+  </div>
+
+  <script>
+    // Lista de PINWHEELs permitidos
+    let allowedPins = ['123456789012345', '987654321098765', '524320547839971', '549522830938253'];
+
+    // PINWHEEL fixo para o usuário
+    const fixedUserPin = 'seuPINFixo';
+
+    // Objeto para armazenar mensagens de usuários e última data de envio
+    let userMessages = {};
+    let lastMessageDate = {};
+
+    // Contador de curtidas
+    let likeCount = 0;
+
+    function retrieveOrGeneratePin() {
+      let userPin = localStorage.getItem('userPin');
+      if (!userPin) {
+        // Se o PINWHEEL não estiver armazenado, usar o PINWHEEL fixo
+        userPin = fixedUserPin;
+        localStorage.setItem('userPin', userPin);
+      }
+      document.getElementById('pinwheelPage').innerHTML = `
+        <h2>Seu PINWHEEL: ${userPin}</h2>
+        <p><a href="https://nubank.com.br/cobrar/tezyu/65ac71d4-2e7b-41ee-9fc0-362977b08070" target="_blank">REALIZAR PIX</a></p>
+        <p>Realize o PIX de R$20,00 e envie o comprovante de pagamento para o número +55 (48) 98433-0340 para ter acesso à nova página.</p>
+      `;
+      document.getElementById('userPin').innerText = userPin;
+      if (allowedPins.includes(userPin)) {
+        document.getElementById('unlockPage').classList.remove('hidden');
+      }
+      checkAndClearMessages();
+    }
+
+    function like() {
+      likeCount++;
+      document.getElementById('likeCount').innerText = likeCount;
+      alert('Você curtiu!');
+    }
+
+    function sendMessage() {
+      let userPin = localStorage.getItem('userPin');
+      if (!userMessages[userPin]) {
+        let message = document.getElementById('messageInput').value;
+        alert(`Mensagem enviada: ${message}`);
+        // Armazenar mensagem do usuário atual
+        userMessages[userPin] = message;
+        lastMessageDate[userPin] = new Date().getMonth(); // Salvar o mês atual
+      } else {
+        alert('Você já enviou uma mensagem neste mês.');
+      }
+    }
+
+    function checkAndClearMessages() {
+      let currentDate = new Date();
+      if (currentDate.getDate() === 29) {
+        // É o dia 29, limpar as mensagens
+        userMessages = {};
+        alert('Mensagens excluídas no dia 29 do mês.');
+      }
+    }
+
+    function searchUser() {
+      let userCode = document.getElementById('searchInput').value;
+      alert(`Pesquisando mensagens do usuário ${userCode}`);
+      displayUserMessages(userCode);
+    }
+
+    function displayUserMessages(userCode) {
+      let messages = userMessages[userCode];
+      if (messages) {
+        document.getElementById('userMessages').innerHTML = `<h3>Mensagens do Usuário ${userCode}</h3><p>${messages}</p>`;
+      } else {
+        document.getElementById('userMessages').innerHTML = `<h3>Nenhuma mensagem encontrada para o usuário ${userCode}</h3>`;
+      }
+    }
+
+    function searchMessages() {
+      let keyword = document.getElementById('searchMessagesInput').value;
+      let foundMessages = [];
+      for (let userCode in userMessages) {
+        if (userMessages.hasOwnProperty(userCode)) {
+          let userMessage = userMessages[userCode];
+          if (userMessage.includes(keyword)) {
+            foundMessages.push(`<p>${userCode}: ${userMessage}</p>`);
+          }
+        }
+      }
+      displayFoundMessages(foundMessages);
+    }
+
+    function displayFoundMessages(messages) {
+      let foundMessagesDiv = document.getElementById('foundMessages');
+      foundMessagesDiv.innerHTML = messages.length > 0 ?
+        `<h3>Mensagens Encontradas</h3>${messages.join('')}` :
+        `<h3>Nenhuma mensagem encontrada com a palavra-chave</h3>`;
+    }
+  </script>
+
+</body>
+</html>
